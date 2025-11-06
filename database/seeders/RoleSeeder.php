@@ -6,21 +6,16 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
-/*
-| --------------------------------------------------------------------
-|  RoleSeeder: Populate the database with user roles and permissions.
-| --------------------------------------------------------------------
-*/
 class RoleSeeder extends Seeder
 {
-    /*
-    | -------------------------
-    |  Run the database seeds.
-    | -------------------------
-    */
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $permissions = [
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $permissionsArray = [
             'users' => ['viewAny', 'view', 'create', 'update', 'delete'],
             'departments' => ['viewAny', 'view', 'create', 'update', 'delete'],
             'suppliers' => ['viewAny', 'view', 'create', 'update', 'delete'],
@@ -31,11 +26,20 @@ class RoleSeeder extends Seeder
             'purchaseOrders' => ['viewAny', 'view', 'create', 'update', 'delete'],
         ];
 
-        foreach ($permissions as $module => $actions) {
-            foreach ($actions as $action) {
-                Permission::firstOrCreate(['name' => "$module.$action"]);
-            }
-        }
+        $permissions = collect($permissionsArray)
+            ->flatMap(fn ($actions, $resource) =>
+                collect($actions)->map(fn ($action) => [
+                    'name' => "$resource:$action",
+                    'guard_name' => 'web',
+                ])
+            )
+            ->toArray();
+
+        // Delete permissions removed from the array
+        Permission::whereNotIn('name', collect($permissions)->pluck('name'))->delete();
+
+        // And insert new ones...
+        Permission::upsert($permissions, ['name'], ['guard_name']);
 
         $rolePermissions = [
             'procurement' => [

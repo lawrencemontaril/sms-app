@@ -9,73 +9,47 @@ use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
-    /*
-    | -------------------------
-    |  Run the database seeds.
-    | -------------------------
-    */
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
         $users = [
             [
-                'name' => 'Harlene Muñoz',
-                'email' => 'harlenemunoz@gmail.com',
+                'name' => 'Admin Staff',
+                'email' => 'admin@sms.com',
+                'password' => '@Super123',
                 'role' => 'procurement',
-                'password' => 'Admin@123',
                 'department_code' => 'PROCR',
                 'is_department_head' => true,
             ],
             [
-                'name' => 'Christine Ann Taborda',
-                'email' => 'christineanntaborda@gmail.com',
+                'name' => 'Accountant Staff',
+                'email' => 'accountant@sms.com',
+                'password' => '@Super123',
                 'role' => 'accountant',
-                'password' => 'Accountant@123',
                 'department_code' => 'FIN',
                 'is_department_head' => true,
             ],
             [
-                'name' => 'Maricon Olfindo',
-                'email' => 'mariconolfindo@gmail.com',
+                'name' => 'CS Faculty Staff',
+                'email' => 'faculty_cs@sms.com',
                 'role' => 'faculty',
-                'password' => 'Faculty@123',
+                'password' => '@Super123',
                 'department_code' => 'SCS',
                 'is_department_head' => true,
             ],
             [
-                'name' => 'Jenjie Dela Peña',
-                'email' => 'jenjiedelapena@gmail.com',
+                'name' => 'SEAT Faculty Staff',
+                'email' => 'faculty_seat@sms.com',
+                'password' => '@Super123',
                 'role' => 'faculty',
-                'password' => 'Faculty@123',
-                'department_code' => 'SCS',
-                'is_department_head' => false,
-            ],
-            [
-                'name' => 'Jayson Nati',
-                'email' => 'jaysonnati@gmail.com',
-                'role' => 'faculty',
-                'password' => 'Faculty@123',
-                'department_code' => 'SCS',
-                'is_department_head' => false,
-            ],
-            [
-                'name' => 'Cathleen Aliyah Catenza',
-                'email' => 'cathleenaliyahcatenza@gmail.com',
-                'role' => 'faculty',
-                'password' => 'Faculty@123',
                 'department_code' => 'SEAT',
                 'is_department_head' => true,
-            ],
-            [
-                'name' => 'Alwyn Matthew Balosa',
-                'email' => 'alwynmatthewbalosa@gmail.com',
-                'role' => 'faculty',
-                'password' => 'Faculty@123',
-                'department_code' => 'SEAT',
-                'is_department_head' => false,
             ],
         ];
 
-        foreach($users as $user) {
+        foreach ($users as $user) {
             $department = Department::where('code', $user['department_code'])->firstOrFail();
 
             $userInstance = User::firstOrCreate([
