@@ -19,13 +19,13 @@ class SupplyStatusChart
     public function build()
     {
         // Define the statuses you want to show in the chart
-        $statuses = ['no_stock', 'low_stock', 'sufficient_stock'];
+        $statuses = ['sufficient_stock', 'low_stock', 'no_stock'];
 
         // Fetch counts from DB
         $counts = [
-            'no_stock' => Supply::noStock()->count(),
+            'sufficient_stock' => Supply::sufficientStock()->count(),
             'low_stock' => Supply::lowStock()->count(),
-            'sufficient_stock' => Supply::sufficientStock()->count()
+            'no_stock' => Supply::noStock()->count(),
         ];
 
         // Ensure all statuses exist (fill missing with 0)
@@ -34,7 +34,7 @@ class SupplyStatusChart
         return $this->chart->pieChart()
             ->setTitle('Supply Request Status Chart')
             ->addData($finalCounts)
-            ->setLabels(array_map('ucfirst', $statuses))
+            ->setLabels(array_map(fn ($status) => ucfirst(str_replace('_', ' ', $status)), $statuses))
             ->setColors([
                 '#22c55e', '#ef4444', '#6b7280'
             ])

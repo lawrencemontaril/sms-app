@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableR
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginatedData, SupplyRequest } from '@/types';
+import { SUPPLY_REQUEST_STATUS } from '@/types/constants';
 import { Head, Link } from '@inertiajs/vue3';
 import { Eye } from 'lucide-vue-next';
 
@@ -15,12 +16,6 @@ defineProps<{
 }>();
 
 const { hasAnyPermissionTo, hasPermissionTo } = usePermissions();
-
-const statusBadge: any = {
-    pending: 'warning',
-    rejected: 'destructive',
-    approved: 'success',
-};
 </script>
 
 <template>
@@ -50,7 +45,7 @@ const statusBadge: any = {
                             <TableHead>Requested By</TableHead>
                             <TableHead>Department</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead v-if="hasAnyPermissionTo(['supply_requsts.view'])">Actions</TableHead>
+                            <TableHead v-if="hasAnyPermissionTo(['supplyRequests.view'])">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -69,22 +64,22 @@ const statusBadge: any = {
 
                             <TableCell>
                                 <Badge
-                                    :variant="statusBadge[supply_request.status]"
+                                    :variant="SUPPLY_REQUEST_STATUS.find((status) => status.value === supply_request.status)?.badge"
                                     class="capitalize"
                                 >
-                                    {{ supply_request.status }}
+                                    {{ SUPPLY_REQUEST_STATUS.find((status) => status.value === supply_request.status)?.label }}
                                 </Badge>
                             </TableCell>
 
                             <TableCell>
                                 <Button
-                                    v-if="hasPermissionTo('supply_requests.view')"
-                                    variant="warning"
+                                    v-if="hasPermissionTo('supplyRequests.view')"
+                                    variant="info"
                                     size="icon"
                                     as-child
                                 >
                                     <Link
-                                        :href="route('supplies.show', supply_request.id)"
+                                        :href="route('supply-requests.show', supply_request.id)"
                                         prefetch
                                     >
                                         <Eye />
