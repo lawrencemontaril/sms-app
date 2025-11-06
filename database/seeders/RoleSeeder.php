@@ -29,7 +29,7 @@ class RoleSeeder extends Seeder
         $permissions = collect($permissionsArray)
             ->flatMap(fn ($actions, $resource) =>
                 collect($actions)->map(fn ($action) => [
-                    'name' => "$resource:$action",
+                    'name' => "$resource.$action",
                     'guard_name' => 'web',
                 ])
             )
@@ -39,7 +39,12 @@ class RoleSeeder extends Seeder
         Permission::whereNotIn('name', collect($permissions)->pluck('name'))->delete();
 
         // And insert new ones...
-        Permission::upsert($permissions, ['name'], ['guard_name']);
+        foreach ($permissions as $perm) {
+            Permission::updateOrCreate(
+                ['name' => $perm['name']],
+                ['guard_name' => $perm['guard_name']]
+            );
+        }
 
         $rolePermissions = [
             'procurement' => [

@@ -19,11 +19,18 @@ return new class extends Migration
     */
     public function up(): void
     {
+        Schema::create('departments', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('name');
+            $table->string('code')
+                ->unique();
+            $table->timestamps();
+        });
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Department::class)
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->unsignedBigInteger('department_id')->nullable();
             $table->string('name');
             $table->string('email')
                 ->unique();
@@ -32,6 +39,14 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+        });
+
+        Schema::table('departments', function (Blueprint $table) {
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('department_id')->references('id')->on('departments')->nullOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

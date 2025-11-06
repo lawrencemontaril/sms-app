@@ -34,12 +34,11 @@ class DepartmentSeeder extends Seeder
             ],
         ];
 
-        foreach($departments as $department) {
+        foreach ($departments as $department) {
             Department::firstOrCreate(
                 ['code' => $department['code']],
                 [
                     'name' => $department['name'],
-                    'code' => $department['code']
                 ]
             );
         }
