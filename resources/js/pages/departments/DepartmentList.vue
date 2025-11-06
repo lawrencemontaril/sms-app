@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import Pagination from '@/components/Pagination.vue';
-import TextLink from '@/components/TextLink.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,14 +7,13 @@ import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Department, PaginatedData } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
+import { Pencil } from 'lucide-vue-next';
 
-interface Props {
+defineProps<{
     departments: PaginatedData<Department>;
-}
+}>();
 
-defineProps<Props>();
-
-const { hasPermissionTo } = usePermissions();
+const { hasPermissionTo, hasAnyPermissionTo } = usePermissions();
 </script>
 
 <template>
@@ -45,7 +43,7 @@ const { hasPermissionTo } = usePermissions();
                             <TableHead>Name</TableHead>
                             <TableHead>Code</TableHead>
                             <TableHead>Head</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead v-if="hasAnyPermissionTo(['departments.update'])">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -62,7 +60,21 @@ const { hasPermissionTo } = usePermissions();
 
                             <TableCell>{{ department.head?.name ?? 'N/A' }}</TableCell>
 
-                            <TableCell><TextLink :href="`/departments/${department.id}/edit`">Edit</TextLink></TableCell>
+                            <TableCell>
+                                <Button
+                                    v-if="hasPermissionTo('departments.update')"
+                                    variant="warning"
+                                    size="icon"
+                                    as-child
+                                >
+                                    <Link
+                                        :href="route('departments.edit', department.id)"
+                                        prefetch
+                                    >
+                                        <Pencil />
+                                    </Link>
+                                </Button>
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>

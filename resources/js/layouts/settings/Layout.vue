@@ -9,14 +9,17 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
         href: '/settings/profile',
+        access: true,
     },
     {
         title: 'Password',
         href: '/settings/password',
+        access: true,
     },
     {
         title: 'Appearance',
         href: '/settings/appearance',
+        access: true,
     },
 ];
 
@@ -27,11 +30,14 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
 
 <template>
     <div class="px-4 py-6">
-        <Heading title="Settings" description="Manage your profile and account settings" />
+        <Heading
+            title="Settings"
+            description="Manage your profile and account settings"
+        />
 
-        <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-x-12 lg:space-y-0">
+        <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-y-0 lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
-                <nav class="flex flex-col space-x-0 space-y-1">
+                <nav class="flex flex-col space-y-1 space-x-0">
                     <Button
                         v-for="item in sidebarNavItems"
                         :key="item.href"
@@ -39,7 +45,10 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
                         :class="['w-full justify-start', { 'bg-muted': currentPath === item.href }]"
                         as-child
                     >
-                        <Link :href="item.href">
+                        <Link
+                            :href="item.href"
+                            prefetch
+                        >
                             {{ item.title }}
                         </Link>
                     </Button>

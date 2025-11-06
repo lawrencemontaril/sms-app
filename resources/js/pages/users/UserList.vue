@@ -1,19 +1,20 @@
 <script lang="ts" setup>
 import Pagination from '@/components/Pagination.vue';
-import TextLink from '@/components/TextLink.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginatedData, User } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
+import { Pencil } from 'lucide-vue-next';
 
-interface Props {
+defineProps<{
     users: PaginatedData<User>;
-}
+}>();
 
-defineProps<Props>();
+const { hasAnyPermissionTo, hasPermissionTo } = usePermissions();
 
 const userRoles = {
     procurement: 'zinc',
@@ -31,7 +32,10 @@ const userRoles = {
                 <div class="flex items-center justify-between gap-4">
                     <CardTitle>Users</CardTitle>
 
-                    <Link href="/users/create" as-child>
+                    <Link
+                        href="/users/create"
+                        as-child
+                    >
                         <Button> Create a user </Button>
                     </Link>
                 </div>
@@ -46,12 +50,15 @@ const userRoles = {
                             <TableHead>Email</TableHead>
                             <TableHead>Role</TableHead>
                             <TableHead>Department</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead v-if="hasAnyPermissionTo(['users.update'])">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
-                        <TableRow v-for="(user, index) in users.data" :key="user.id">
+                        <TableRow
+                            v-for="(user, index) in users.data"
+                            :key="user.id"
+                        >
                             <TableCell>{{ (users.meta.from ?? 0) + index }}</TableCell>
 
                             <TableCell>{{ user.name }}</TableCell>
@@ -59,14 +66,31 @@ const userRoles = {
                             <TableCell>{{ user.email }}</TableCell>
 
                             <TableCell>
-                                <Badge :variant="userRoles[user.role]" class="capitalize">
+                                <Badge
+                                    :variant="userRoles[user.role]"
+                                    class="capitalize"
+                                >
                                     {{ user.role }} {{ user.is_department_head ? 'Head' : '' }}
                                 </Badge>
                             </TableCell>
 
                             <TableCell>{{ user.department?.name }}</TableCell>
 
-                            <TableCell><TextLink :href="`/users/${user.id}/edit`">Edit</TextLink></TableCell>
+                            <TableCell>
+                                <Button
+                                    v-if="hasPermissionTo('users.update')"
+                                    variant="warning"
+                                    size="icon"
+                                    as-child
+                                >
+                                    <Link
+                                        :href="route('users.edit', user.id)"
+                                        prefetch
+                                    >
+                                        <Pencil />
+                                    </Link>
+                                </Button>
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>

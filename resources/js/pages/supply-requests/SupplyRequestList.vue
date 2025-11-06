@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import Pagination from '@/components/Pagination.vue';
-import TextLink from '@/components/TextLink.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,13 +8,13 @@ import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginatedData, SupplyRequest } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
+import { Eye } from 'lucide-vue-next';
 
-interface Props {
+defineProps<{
     supply_requests: PaginatedData<SupplyRequest>;
-}
+}>();
 
-defineProps<Props>();
-const { hasPermissionTo } = usePermissions();
+const { hasAnyPermissionTo, hasPermissionTo } = usePermissions();
 
 const statusBadge: any = {
     pending: 'warning',
@@ -51,7 +50,7 @@ const statusBadge: any = {
                             <TableHead>Requested By</TableHead>
                             <TableHead>Department</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead v-if="hasAnyPermissionTo(['supply_requsts.view'])">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -77,8 +76,20 @@ const statusBadge: any = {
                                 </Badge>
                             </TableCell>
 
-                            <TableCell class="inline-flex gap-2">
-                                <TextLink :href="`/supply-requests/${supply_request.id}`">View</TextLink>
+                            <TableCell>
+                                <Button
+                                    v-if="hasPermissionTo('supply_requests.view')"
+                                    variant="warning"
+                                    size="icon"
+                                    as-child
+                                >
+                                    <Link
+                                        :href="route('supplies.show', supply_request.id)"
+                                        prefetch
+                                    >
+                                        <Eye />
+                                    </Link>
+                                </Button>
                             </TableCell>
                         </TableRow>
 

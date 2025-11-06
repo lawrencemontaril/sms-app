@@ -1,9 +1,9 @@
-import { SharedData, User } from '@/types';
+import { User } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 export function usePermissions() {
-    const page = usePage<SharedData>();
+    const page = usePage();
 
     const user = computed<User | null>(() => page.props.auth.user || null);
 

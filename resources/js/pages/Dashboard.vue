@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import ChartCard from '@/components/ChartCard.vue';
+import ChartGrid from '@/components/ChartGrid.vue';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useFormatters } from '@/composables/useFormatters';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem, Supply } from '@/types';
 import { Deferred, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import ApexChart from 'vue3-apexcharts';
 
 interface Props {
     total_supplies: number;
@@ -14,8 +14,8 @@ interface Props {
     total_supply_requests: number;
     total_approved_supply_requests: number;
     total_rejected_supply_requests: number;
-    approved_rejected_ratio: { pending: number; approved: number; rejected: number };
-    supply_stock_ratio: { no_stock: number; low_stock: number; sufficient_stock: number };
+    supplyRequestStatusChart: any;
+    supplyStatusChart: any;
     low_stock_supplies: Supply[];
 }
 
@@ -30,42 +30,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
-
-const approvedRejectedDonutChartOptions = ref({
-    labels: ['Pending', 'Approved', 'Rejected'],
-    colors: ['#f59e0b', '#10b981', '#ef4444'], // Green & Red
-    responsive: [
-        {
-            breakpoint: 480,
-            options: {
-                chart: {
-                    width: 300,
-                },
-                legend: {
-                    position: 'bottom',
-                },
-            },
-        },
-    ],
-});
-
-const supplyStockRatioChartOptions = ref({
-    labels: ['Sufficient stock', 'Low stock', 'No stock'],
-    colors: ['#22c55e', '#ef4444', '#6b7280'],
-    responsive: [
-        {
-            breakpoint: 480,
-            options: {
-                chart: {
-                    width: 300,
-                },
-                legend: {
-                    position: 'bottom',
-                },
-            },
-        },
-    ],
-});
 </script>
 
 <template>
@@ -141,45 +105,21 @@ const supplyStockRatioChartOptions = ref({
                         </div>
                     </div>
                 </Deferred>
-
-                <!-- Donut Chart -->
-                <Deferred data="approved_rejected_ratio">
-                    <template #fallback>
-                        <div class="p-4 text-center text-gray-500">Loading chart...</div>
-                    </template>
-
-                    <div class="overflow-hidden rounded-xl border border-zinc-700">
-                        <div class="border-b border-zinc-700 px-4 py-2">Supply request approval chart</div>
-
-                        <ApexChart
-                            type="donut"
-                            :options="approvedRejectedDonutChartOptions"
-                            :series="[approved_rejected_ratio.pending, approved_rejected_ratio.approved, approved_rejected_ratio.rejected]"
-                            width="380"
-                        />
-                    </div>
-                </Deferred>
-
-                <Deferred
-                    v-if="hasAnyRole(['procurement', 'accountant'])"
-                    data="supply_stock_ratio"
-                >
-                    <template #fallback>
-                        <div class="p-4 text-center text-gray-500">Loading chart...</div>
-                    </template>
-
-                    <div class="overflow-hidden rounded-xl border border-zinc-700">
-                        <div class="border-b border-zinc-700 px-4 py-2">Supplies stock status</div>
-
-                        <ApexChart
-                            type="donut"
-                            :options="supplyStockRatioChartOptions"
-                            :series="[supply_stock_ratio.sufficient_stock, supply_stock_ratio.low_stock, supply_stock_ratio.no_stock]"
-                            width="380"
-                        />
-                    </div>
-                </Deferred>
             </div>
+
+            <ChartGrid :columns="2">
+                <ChartCard
+                    chartKey="supplyRequestStatusChart"
+                    :chart="supplyRequestStatusChart"
+                    :col-span="1"
+                />
+
+                <ChartCard
+                    chartKey="supplyStatusChart"
+                    :chart="supplyStatusChart"
+                    :col-span="1"
+                />
+            </ChartGrid>
 
             <Deferred data="low_stock_supplies">
                 <template #fallback> Loading... </template>

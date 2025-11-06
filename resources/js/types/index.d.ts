@@ -1,4 +1,3 @@
-import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
@@ -21,17 +20,22 @@ export interface NavItem {
     access: boolean;
 }
 
-export interface SharedData extends PageProps {
+export type AppPageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     name: string;
     auth: Auth;
+    flash?: {
+        success: string;
+        error: string;
+        info: string;
+    };
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
-}
+};
 
 /*
-| ---------------------
-|  Backend data types.
-| ---------------------
+|------------------------------------------------------------------------------
+| Resource types
+|------------------------------------------------------------------------------
 */
 export interface PaginatedData<T> {
     data: T[];

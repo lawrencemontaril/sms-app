@@ -22,7 +22,7 @@ class AnalyticsService
 
         return SupplyRequest::with('supplyRequestItems.supply')
             ->where('user_id', auth()->user()->id)
-            ->where('status', 'approved')
+            ->approved()
             ->get()
             ->sum('total_cost');
     }
@@ -38,21 +38,21 @@ class AnalyticsService
 
     public function getTotalApprovedSupplyRequests()
     {
-        return Supply::where('status', 'approved')->count();
+        return SupplyRequest::approved()->count();
     }
 
     public function getTotalRejectedSupplyRequests()
     {
-        return Supply::where('status', 'rejected')->count();
+        return SupplyRequest::rejected()->count();
     }
 
     public function getSupplyRequestApprovedRejectedRatio()
     {
         if (auth()->user()->hasAnyRole(['procurement', 'accountant'])) {
             return [
-                'pending' => SupplyRequest::where('status', 'pending')->count(),
-                'approved' => SupplyRequest::where('status', 'approved')->count(),
-                'rejected' => SupplyRequest::where('status', 'rejected')->count(),
+                'pending' => SupplyRequest::pending()->count(),
+                'approved' => SupplyRequest::approved()->count(),
+                'rejected' => SupplyRequest::rejected()->count(),
             ];
         }
 

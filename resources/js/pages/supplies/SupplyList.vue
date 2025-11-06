@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import Pagination from '@/components/Pagination.vue';
-import TextLink from '@/components/TextLink.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Input from '@/components/ui/input/Input.vue';
@@ -12,23 +11,18 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { cn } from '@/lib/utils';
 import { PaginatedData, Supply } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Search } from 'lucide-vue-next';
+import { Pencil, Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
-interface Props {
+const props = defineProps<{
     supplies: PaginatedData<Supply>;
-}
+    filters: {
+        search?: string;
+        stock_status?: string;
+    };
+}>();
 
-const props = defineProps<
-    Props & {
-        filters: {
-            search?: string;
-            stock_status?: string;
-        };
-    }
->();
-
-const { hasPermissionTo } = usePermissions();
+const { hasAnyPermissionTo, hasPermissionTo } = usePermissions();
 const { formatCurrency } = useFormatters();
 
 const search = ref(props.filters.search ?? '');
@@ -111,7 +105,7 @@ watch([search, stockStatus], () => {
                             <TableHead>Price</TableHead>
                             <TableHead>Quantity</TableHead>
                             <TableHead>Reorder Level</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead v-if="hasAnyPermissionTo(['supplies.update'])">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -136,7 +130,21 @@ watch([search, stockStatus], () => {
 
                             <TableCell>{{ supply.reorder_level }}pcs</TableCell>
 
-                            <TableCell><TextLink :href="`/supplies/${supply.id}/edit`">Edit</TextLink></TableCell>
+                            <TableCell>
+                                <Button
+                                    v-if="hasPermissionTo('supplies.update')"
+                                    variant="warning"
+                                    size="icon"
+                                    as-child
+                                >
+                                    <Link
+                                        :href="route('supplies.edit', supply.id)"
+                                        prefetch
+                                    >
+                                        <Pencil />
+                                    </Link>
+                                </Button>
+                            </TableCell>
                         </TableRow>
 
                         <TableEmpty

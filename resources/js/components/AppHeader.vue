@@ -147,6 +147,7 @@ const mainNavItems: NavItem[] = [
                                 <Link
                                     v-if="item.access"
                                     :href="item.href"
+                                    prefetch
                                 >
                                     <NavigationMenuLink :class="[navigationMenuTriggerStyle(), activeItemStyles(item), 'h-9 cursor-pointer px-3']">
                                         <component
